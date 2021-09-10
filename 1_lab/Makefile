@@ -21,6 +21,8 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 SRC_DIR=src
 TEST_DIR=tests
 
+GTEST_INCLUDE2 = ../googletest/googletest/include/gtest
+
 DEBUG = -g
 
 .PHONY: default
@@ -74,6 +76,8 @@ fuzz-start:
 
 # GTest facility
 # Taken from https://gist.github.com/mihaitodor/bfb8e7ad908489fdf3ceb496573f306a
+#
+.PHONY: tests/gtest-all.o tests/gtest_main.o tests/gtest_main.a tests/test.o
 tests/gtest-all.o: gtest-all.o
 gtest-all.o: $(GTEST_SRCS_)
 	$(CXX) -I $(GTEST_DIR) -I $(GTEST_INCLUDE) $(DEBUG) $(CXXFLAGS) -c $(GTEST_DIR)/src/gtest-all.cc -o tests/$@
@@ -88,10 +92,11 @@ gtest.a: tests/gtest-all.o
 tests/gtest_main.a: gtest_main.a
 gtest_main.a: tests/gtest-all.o tests/gtest_main.o
 	$(AR) $(ARFLAGS) tests/$@ $^
+	@echo "gtest_main.a compiled successfully"
 
 tests/test.o: test.o
 test.o: $(TEST_DIR)/test.cc $(GTEST_HEADERS)
-	$(CXX) $(CXXFLAGS) $(DEBUG) -c $(TEST_DIR)/test.cc $(SAN) -o tests/test.o
+	$(CXX) $(CXXFLAGS) -I$(GTEST_INCLUDE2) $(DEBUG) -c $(TEST_DIR)/test.cc $(SAN) -o tests/test.o
 
 test.out: tests/test.o tests/gtest_main.a
 	$(CXX) $(CXXFLAGS) $(SAN) $(DEBUG) -lpthread $^ -o $@

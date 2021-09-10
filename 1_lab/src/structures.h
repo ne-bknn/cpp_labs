@@ -11,14 +11,13 @@ namespace Structures {
     struct Pair {
 	T1 first;
 	T2 second;
-        
-        Pair() {
-        }
 
-        Pair(T1 a, T2 b) {
-                this->first = a;
-                this->second = b;
-        }
+	Pair() {}
+
+	Pair(T1 a, T2 b) {
+	    this->first = a;
+	    this->second = b;
+	}
 	/*
 	inline bool operator=(const Pair<T1, T2>& x) {
 	    first = x.first;
@@ -57,7 +56,7 @@ namespace Structures {
 	T* end();
 
 	T const& operator[](size_t index) const;  // no assignment
-	T& operator[](size_t index);                 // assignment
+	T& operator[](size_t index);              // assignment
 
 	inline Structures::Vector<T>& operator=(const Vector<T>& other) {
 	    if (this != other) {
@@ -70,11 +69,13 @@ namespace Structures {
 	}
     };
 
+    // wrong, obviously
     template <typename T>
     inline T* Structures::Vector<T>::begin() {
 	return this->length() ? &this->data[0] : nullptr;
     }
 
+    // also wrong
     template <typename T>
     inline T* Structures::Vector<T>::end() {
 	return this->length() ? &this->data[0] + this->length() : nullptr;
@@ -154,16 +155,15 @@ namespace Structures {
 	return "Placeholder 1 2 3\n";
     }
 
-    /*
     template <typename T>
     inline ::std::ostream& operator<<(::std::ostream& out,
                                       Structures::Vector<T>& vector) {
-        out << vector.print();
+	out << vector.print();
     }
-    */
+
     template <typename T>
     inline T const& Structures::Vector<T>::operator[](size_t index) const {
-        if (this->_length < index + 1) {
+	if (this->_length < index + 1) {
 	    throw ::std::out_of_range("Get out of bounds");
 	}
 
@@ -185,7 +185,7 @@ namespace Structures {
     template <typename T>
     class CSRMatrix {
        private:
-        // n rows, m columns
+	// n rows, m columns
 	size_t n;
 	size_t m;
 	Vector<Pair<size_t, T>>* rows;
@@ -197,25 +197,31 @@ namespace Structures {
 	std::string print();
 
 	void set(int x, int y, T val);
-	void push(int row, Pair<size_t, T> val);
-	const T get(int row, int column);
+	// raw push to array
+	void _push(int row, Pair<size_t, T> val);
+
+	void push(int row, T val);
+
+	const T get(size_t row, size_t column);
 	Vector<Pair<size_t, T>>& get_row(int row);
 	const Vector<Pair<size_t, T>>& operator[](size_t index);
     };
 
     template <typename T>
-    inline const Vector<Pair<size_t, T>>& Structures::CSRMatrix<T>::operator[](size_t index) {
-            return rows[index];
+    inline const Vector<Pair<size_t, T>>& Structures::CSRMatrix<T>::operator[](
+        size_t index) {
+	return rows[index];
     }
 
     template <typename T>
     inline Structures::CSRMatrix<T>::CSRMatrix(size_t n, size_t m) {
 	this->n = n;
 	this->m = m;
-        
-        // array of n pointers to Vector<T>
+
+	// array of n pointers to Vector<T>
 	this->rows = new Vector<Pair<size_t, T>>[n];
-	//for (int i = 0; i < n; ++i) {
+
+	// for (int i = 0; i < n; ++i) {
 	//    this->rows[i] = new Vector<Pair<size_t, T>>();
 	//}
     }
@@ -226,11 +232,67 @@ namespace Structures {
     }
 
     template <typename T>
-    inline void Structures::CSRMatrix<T>::set(int x, int y, T val) {}
+    inline void Structures::CSRMatrix<T>::set(int x, int y, T val) {
+	this->rows[x][y].second = val;
+    }
 
     template <typename T>
-    inline void Structures::CSRMatrix<T>::push(int row, Pair<size_t, T> val) {
+    inline void Structures::CSRMatrix<T>::_push(int row, Pair<size_t, T> val) {
 	Vector<Pair<size_t, T>>& _row = rows[row];
 	_row.push(val);
+    }
+
+    template <typename T>
+    inline void Structures::CSRMatrix<T>::push(int row, T val) {
+	Structures::Vector<Pair<size_t, T>>& line = this->rows[row];
+	if (line.length() == 0) {
+	    line.push(Structures::Pair<size_t, T>(0, val));
+	    return;
+	}
+
+	if (val == 0) {
+	    if (line[line.length() - 1].second == 0) {
+		line[line.length() - 1].first =
+		    line[line.length() - 1].first + 1;
+	    } else {
+		line.push(Structures::Pair<size_t, T>(
+		    line[line.length() - 1].first + 1, 0));
+	    }
+	} else {
+	    if (line[line.length() - 1].second == 0) {
+		line[line.length() - 1].second = val;
+		line[line.length() - 1].first =
+		    line[line.length() - 1].first + 1;
+	    } else {
+		line.push(Structures::Pair<size_t, T>(line.length(), val));
+	    }
+	}
+    }
+
+    template <typename T>
+    inline const T Structures::CSRMatrix<T>::get(size_t row, size_t column) {
+	Structures::Vector<Pair<size_t, T>>& line = this->rows[row];
+	if (line.length() == 0 || column > line[line.length() - 1].first) {
+	    throw ::std::out_of_range("CSRMatrix get out of range");
+	}
+
+	long long l = -1;
+	long long r = line.length();
+	long long m;
+
+	while (l < r - 1) {
+	    m = (r + l) / 2;
+	    if (line[m].first < column) {
+		l = m;
+	    } else {
+		r = m;
+	    }
+	}
+
+	if (line[r].first == column) {
+	    return line[r].second;
+	}
+
+	return 0;
     }
 }  // namespace Structures
