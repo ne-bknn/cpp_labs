@@ -1,2 +1,6 @@
 *.out
 tags
+*.a
+*.o
+*/docs/
+*/output/
