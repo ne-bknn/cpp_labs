@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <iostream>
 
 // I've implemented this one in previous lab, so I can use it
@@ -14,7 +15,7 @@ namespace ui {
 				throw std::runtime_error("EOF");
 			}
 			std::cin.clear();
-			std::cin.ignore();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		}
 	}
 	std::string get_str();
