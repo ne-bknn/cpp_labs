@@ -61,6 +61,7 @@ fuzz-prepare:
 fuzz-start:
 	tmux new-session -d -s "fuzzing" afl-fuzz -i cases -o output -- ./fuzz.out
 
+# tests
 tests/test.o: test.o
 test.o: $(TEST_DIR)/test.cc $(GTEST_HEADERS)
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $(TEST_DIR)/test.cc $(SAN) -o tests/test.o
@@ -71,9 +72,11 @@ test.out: tests/test.o ../include/gtest_main.a
 test: test.out
 	@./test.out
 
+# build debug
 graph.dot: Makefile
 	@make -Bnd | make2graph > graph.dot
 
+# shared library
 libcurve.o: src/curve.cc
 	$(CXX) -c -Wall -fpic src/curve.cc -o libcurve.o
 
