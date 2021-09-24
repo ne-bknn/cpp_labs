@@ -73,3 +73,12 @@ test: test.out
 
 graph.dot: Makefile
 	@make -Bnd | make2graph > graph.dot
+
+libcurve.o: src/curve.cc
+	$(CXX) -c -Wall -fpic src/curve.cc -o libcurve.o
+
+libcurve.so: libcurve.o src/curve.h
+	$(CXX) -shared -o libcurve.so libcurve.o
+
+task_shared.out: src/main.cc libcurve.so
+	$(CXX) -L. -lcurve -Wl,-rpath=. -Wall -Wextra -o task_shared.out uilib/uilib.cc src/main.cc

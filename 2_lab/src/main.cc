@@ -9,7 +9,7 @@ int main() {
 	std::cout
 	    << "Enter curve's radius. Radius cannot be negative or zero: ";
 	try {
-		ui::get(r);
+	    ui::get(r);
 	} catch (std::runtime_error&) {
 	    std::cout << "[-] Caught EOF, exiting" << std::endl;
 	    break;
