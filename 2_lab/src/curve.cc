@@ -3,12 +3,41 @@
 #include <math.h>
 
 #include <iostream>
-#include <sstream>
 #include <string>
+#include <string.h>
+
+Nephroid::Nephroid() {
+   this->_r = 1;
+   this->_repr = nullptr;
+   this->_repr_len = 0;
+}
 
 Nephroid::Nephroid(double r) {
     this->_r = r;
     this->_repr = nullptr;
+    this->_repr_len = 0;
+}
+
+Nephroid::Nephroid(const Nephroid &obj) noexcept {
+    this->_r = obj._r;
+    this->_repr = new char[obj._repr_len];
+    strncpy(this->_repr, obj._repr, obj._repr_len);
+    this->_repr_len = obj._repr_len;
+}
+
+Nephroid& Nephroid::operator=(const Nephroid &obj) noexcept {
+    if (this != &obj) {
+	    this->_r = obj._r;
+	    if (obj._repr != nullptr) {
+	    	this->_repr = new char[obj._repr_len];
+    	    	strncpy(this->_repr, obj._repr, obj._repr_len);
+	    } else {
+		this->_repr = nullptr;
+	    }
+
+	    this->_repr_len = obj._repr_len;
+    }
+    return *this;
 }
 
 Nephroid::~Nephroid() {
@@ -23,8 +52,9 @@ void Nephroid::set_r(double r) {
     }
 
     this->_r = r;
-    delete this->_repr;
+    delete[] this->_repr;
     this->_repr = nullptr;
+    this->_repr_len = 0;
 }
 
 double Nephroid::r() { return this->_r; }
@@ -56,6 +86,7 @@ char* Nephroid::repr() {
 	char* repr = new char[buf_len];
 	sprintf(repr, "(x^2+y^2-%0.3f)^3=%0.3f*x^4", coef_a, coef_b);
 	this->_repr = repr;
+	this->_repr_len = buf_len;
     }
     return this->_repr;
 }

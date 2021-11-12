@@ -2,9 +2,13 @@ class Nephroid {
    private:
     double _r;
     char* _repr;
+    int _repr_len;
 
    public:
+    explicit Nephroid();
     explicit Nephroid(double r);
+    explicit Nephroid(const Nephroid &obj) noexcept;
+    Nephroid& operator=(const Nephroid &obj) noexcept;
     ~Nephroid();
     double r();
     double R();

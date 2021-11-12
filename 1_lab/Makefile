@@ -1,5 +1,5 @@
 CXX = clang++
-CXXAFL = afl-clang-fast++
+CXXAFL = afl-clang++
 
 SAN = -fsanitize=address,undefined
 
@@ -26,7 +26,8 @@ GTEST_INCLUDE2 = ../googletest/googletest/include/gtest
 DEBUG = -g
 
 .PHONY: default
-default: fmt lint test build docs fuzz
+#default: fmt lint test build docs fuzz
+default: fmt lint build docs fuzz
 
 .PHONY: fmt
 fmt: src/*.h src/*.cc
@@ -59,7 +60,6 @@ docs: .doxygen.conf
 
 .PHONY: fuzz
 fuzz: fuzz-build fuzz-prepare fuzz-start
-	@echo "============================================================================"
 
 .PHONY: fuzz-build
 fuzz-build:

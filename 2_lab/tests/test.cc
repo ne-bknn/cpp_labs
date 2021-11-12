@@ -17,6 +17,21 @@ TEST(Nephroid, Repr) {
   curve.repr();
 }
 
+TEST(Nephroid, Repr_2) {
+  Nephroid curve(100);
+  curve.repr();
+  curve.set_r(50);
+  curve.repr();
+  curve.set_r(100);
+}
+
+TEST(Nephroid, OpEqual) {
+  Nephroid curve(100);
+  Nephroid a;
+  a = curve;
+  ASSERT_NE(&a, &curve);
+}
+
 // No more tests rationale - all of the Nephroid method's are basic
 // calculations. They do not require carefully built interfaces;
 // they do not modify the state (except for set_r). 

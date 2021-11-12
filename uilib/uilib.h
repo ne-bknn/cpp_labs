@@ -19,6 +19,7 @@ namespace ui {
 		}
 	}
 	std::string get_str();
+	std::string get_str_custom(std::istream& is);
 	
 	/*
 	namespace {

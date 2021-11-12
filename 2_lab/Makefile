@@ -40,6 +40,8 @@ clean:
 	-@rm tests/*.a tests/*.o tests/*.out &> /dev/null || true
 	-@rm -r docs/ &> /dev/null || true
 	-@rm -r output/ &> /dev/null || true
+	-@rm -r *.so &> /dev/null || true
+	-@rm -r *.o &> /dev/null || true
 
 .PHONY: docs
 docs: .doxygen.conf
@@ -82,6 +84,10 @@ libcurve.o: src/curve.cc
 
 libcurve.so: libcurve.o src/curve.h
 	$(CXX) -shared -o libcurve.so libcurve.o
+	-@rm libcurve.o
 
 task_shared.out: src/main.cc libcurve.so
 	$(CXX) -L. -lcurve -Wl,-rpath=. -Wall -Wextra -o task_shared.out uilib/uilib.cc src/main.cc
+
+.PHONY: lib
+lib: task_shared.out
