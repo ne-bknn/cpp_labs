@@ -20,9 +20,10 @@ class Trie {
     void copy(struct TrieNode* root, struct TrieNode* new_root);
   public:
     explicit Trie() noexcept;
-    explicit Trie(const Trie &obj) noexcept;
-    explicit Trie(Trie &&obj) noexcept;
+    Trie(const Trie &obj) noexcept;
+    Trie(Trie &&obj) noexcept;
     Trie& operator=(const Trie &obj) noexcept;
+    Trie& operator=(Trie&& obj) noexcept;
     ~Trie();
 
     void add(const char* word, int index);

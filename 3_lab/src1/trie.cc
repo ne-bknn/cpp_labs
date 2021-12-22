@@ -34,6 +34,7 @@ Trie::Trie(Trie &&obj) noexcept {
 	obj.root = nullptr;
 }
 
+// copy
 Trie& Trie::operator=(const Trie &obj) noexcept {
 	if (this != &obj) {
 		free_trie(this->root);
@@ -41,6 +42,15 @@ Trie& Trie::operator=(const Trie &obj) noexcept {
 		copy(obj.root, this->root);
 	}
 
+	return *this;
+}
+
+// move
+Trie& Trie::operator=(Trie&& obj) noexcept {
+	if (this != &obj) {
+		this->root = obj.root;
+		obj.root = nullptr;
+	}
 	return *this;
 }
 

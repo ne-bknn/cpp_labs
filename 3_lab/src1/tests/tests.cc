@@ -84,7 +84,16 @@ TEST(Trie, EqOperator) {
 	ASSERT_TRUE(trie2.contains("asdf"));
 }
 
+Trie op() {
+	Trie trie;
+	trie.add("asdf", 0);
+	return trie;
+}
 
+TEST(Trie, ReturnFromFunction) {
+	Trie trie = op();
+	ASSERT_TRUE(trie.contains("asdf"));
+}
 
 TEST(WordArray, Init) {
 	WordArray word_array;
