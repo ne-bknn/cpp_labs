@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gtkmm.h>
+
 #include "library.h"
 
 class MainWindow : public Gtk::Window {
@@ -16,6 +17,7 @@ class MainWindow : public Gtk::Window {
     Gtk::MenuItem menuFileSave;
     Gtk::MenuItem menuFileLoadDefault;
     Gtk::MenuItem menuEditNew;
+
    protected:
     Gtk::Box realMainBox;
     Gtk::Box mainBox;
@@ -30,6 +32,7 @@ class MainWindow : public Gtk::Window {
 
     void on_button_quit();
     void update_view();
+    void on_button_file_clicked();
 
     class tColumns : public Gtk::TreeModel::ColumnRecord {
        public:
@@ -57,7 +60,8 @@ class MainWindow : public Gtk::Window {
    public:
     MainWindow();
     ~MainWindow();
-    void on_treeview_row_activated(const Gtk::TreeModel::Path&, Gtk::TreeViewColumn*);
+    void on_treeview_row_activated(const Gtk::TreeModel::Path&,
+                                   Gtk::TreeViewColumn*);
     void update_view_box(Gtk::Box&, std::string code);
     void set_table(std::shared_ptr<PubTable> table);
 };

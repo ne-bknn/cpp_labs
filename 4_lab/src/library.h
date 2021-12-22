@@ -2,9 +2,9 @@
 
 #include <map>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -22,16 +22,16 @@ class PubDescription {
     int get_amount() const;
     void set_amount(int n);
 
-    void set_code(const std::string &code);
+    void set_code(const std::string& code);
     std::string get_code() const;
 
-    void set_author(const std::string &author);
+    void set_author(const std::string& author);
     std::string get_author() const;
 
-    void set_title(const std::string &title);
+    void set_title(const std::string& title);
     std::string get_title() const;
 
-    void set_publisher(const std::string &code);
+    void set_publisher(const std::string& code);
     std::string get_publisher() const;
 
     void set_pub_year(int year);
@@ -45,7 +45,7 @@ class PubDescription {
 };
 
 class PubDescriptionWithCourses : public PubDescription {
-   private:
+   protected:
     std::vector<std::string> courses;
 
    public:
@@ -64,7 +64,7 @@ class PubDescriptionWithCourses : public PubDescription {
 };
 
 class StudyPubDescription : public PubDescriptionWithCourses {
-   private:
+   protected:
     // RATIONALE: already implemented
     std::vector<std::string> group_indecies;
 
@@ -73,6 +73,9 @@ class StudyPubDescription : public PubDescriptionWithCourses {
 
     virtual const int max_courses() const override { return 1; }
     virtual const std::string get_description() const override;
+
+    friend void to_json(json& j, const PubDescription& p);
+    friend void from_json(const json& j, PubDescription& p);
 };
 
 // RATIONALE: there's no explicit inheritance relation
@@ -84,20 +87,25 @@ class StudyPubDescription : public PubDescriptionWithCourses {
 class SciPubDescription : public PubDescriptionWithCourses {
    public:
     virtual const std::string type() const override { return "scientific"; }
-
-    virtual const int max_courses() const override { return -1; }
+    virtual const int max_courses() const override { return 3; }
     virtual const std::string get_description() const override;
+
+    friend void to_json(json& j, const PubDescription& p);
+    friend void from_json(const json& j, PubDescription& p);
 };
 
 class FictionPubDescription : public PubDescription {
-   private:
+   protected:
     std::string genre;
 
    public:
     std::string get_genre() const;
-    void set_genre(const std::string &new_genre);
+    void set_genre(const std::string& new_genre);
     virtual const std::string type() const override { return "fiction"; }
     virtual const std::string get_description() const override;
+
+    friend void to_json(json& j, const PubDescription& p);
+    friend void from_json(const json& j, PubDescription& p);
 };
 
 class PubTable {
@@ -106,12 +114,14 @@ class PubTable {
     std::map<std::string, std::shared_ptr<PubDescription>> _table;
 
    public:
-    void add(const std::string &code, std::shared_ptr<PubDescription> desc);
-    std::shared_ptr<PubDescription> get(const std::string &code) const;
-    bool remove(const std::string &code);
+    void add(const std::string& code, std::shared_ptr<PubDescription> desc);
+    std::shared_ptr<PubDescription> get(const std::string& code) const;
+    bool remove(const std::string& code);
 
     std::map<std::string, std::shared_ptr<PubDescription>>::iterator begin();
     std::map<std::string, std::shared_ptr<PubDescription>>::iterator end();
+    void load_json(std::string filename);
+    void clean();
 };
 
 void to_json(json& j, const PubDescription& p);
