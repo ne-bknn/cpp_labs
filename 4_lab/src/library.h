@@ -69,6 +69,7 @@ class StudyPubDescription : public PubDescriptionWithCourses {
     std::vector<std::string> group_indecies;
 
    public:
+    void add_group(std::string group_name);
     virtual const std::string type() const override { return "study"; }
 
     virtual const int max_courses() const override { return 1; }
@@ -121,6 +122,7 @@ class PubTable {
     std::map<std::string, std::shared_ptr<PubDescription>>::iterator begin();
     std::map<std::string, std::shared_ptr<PubDescription>>::iterator end();
     void load_json(std::string filename);
+    void save_json(std::string filename);
     void clean();
 };
 

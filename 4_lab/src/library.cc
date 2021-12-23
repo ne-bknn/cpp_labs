@@ -75,11 +75,14 @@ std::shared_ptr<PubDescription> PubTable::get(const std::string &code) const {
 }
 
 bool PubTable::remove(const std::string &code) {
+    std::cout << "Removing " << code << std::endl;
     auto it = this->_table.find(code);
     if (it != this->_table.end()) {
 	this->_table.erase(it);
+	std::cout << "Removed" << std::endl;
 	return true;
     } else {
+	std::cout << "Not removed" << std::endl;
 	return false;
     }
 }
@@ -106,6 +109,9 @@ const std::string FictionPubDescription::get_description() const {
     std::stringstream ss;
     ss << "Title: " << this->get_title() << std::endl;
     ss << "Author: " << this->get_author() << std::endl;
+    ss << "Publication year: " << this->get_pub_year() << std::endl;
+    ss << "Publisher: " << this->get_publisher() << std::endl;
+    ss << "Amount: " << this->get_amount() << std::endl;
     ss << "Genre: " << this->get_genre() << std::endl;
     return ss.str();
 }
@@ -114,6 +120,17 @@ const std::string SciPubDescription::get_description() const {
     std::stringstream ss;
     ss << "Title: " << this->get_title() << std::endl;
     ss << "Author: " << this->get_author() << std::endl;
+    ss << "Publication year: " << this->get_pub_year() << std::endl;
+    ss << "Publisher: " << this->get_publisher() << std::endl;
+    ss << "Amount: " << this->get_amount() << std::endl;
+    ss << "Courses: ";
+    for (auto c : this->courses) {
+	    if (c != "") {
+		    ss << c << ", ";
+	    }
+    }
+    ss << std::endl;
+
     return ss.str();
 }
 
@@ -121,6 +138,24 @@ const std::string StudyPubDescription::get_description() const {
     std::stringstream ss;
     ss << "Title: " << this->get_title() << std::endl;
     ss << "Author: " << this->get_author() << std::endl;
+    ss << "Publication year: " << this->get_pub_year() << std::endl;
+    ss << "Publisher: " << this->get_publisher() << std::endl;
+    ss << "Amount: " << this->get_amount() << std::endl;
+    ss << "Courses: ";
+    for (auto c : this->courses) {
+	    if (c != "") {
+		    ss << c << ", ";
+	    }
+    }
+    ss << std::endl;
+
+    ss << "Groups: ";
+    for (auto c : this->group_indecies) {
+	    if (c != "") {
+		    ss << c << ", ";
+	    }
+    }
+    ss << std::endl;
     return ss.str();
 }
 
@@ -130,14 +165,14 @@ void to_json(json &j, const PubDescription &p) {
 	j = json{{"title", p.title},   {"author", p.author},
 	         {"code", p.code},     {"genre", derived_ref.genre},
 	         {"year", p.pub_year}, {"publisher", p.publisher},
-	         {"amount", p.amount}};
+	         {"amount", p.amount}, {"type", p.type()}};
     } else if (p.type() == "scientific") {
 	auto derived_ref = dynamic_cast<const SciPubDescription &>(p);
 	json courses(derived_ref.courses);
 	j = json{{"title", p.title},   {"author", p.author},
 	         {"code", p.code},     {"year", p.pub_year},
 	         {"amount", p.amount}, {"publisher", p.publisher},
-	         {"courses", courses}};
+	         {"courses", courses}, {"type", p.type()}};
     } else if (p.type() == "study") {
 	auto derived_ref = dynamic_cast<const StudyPubDescription &>(p);
 	json courses(derived_ref.courses);
@@ -145,7 +180,8 @@ void to_json(json &j, const PubDescription &p) {
 	j = json{{"title", p.title},   {"author", p.author},
 	         {"code", p.code},     {"year", p.pub_year},
 	         {"amount", p.amount}, {"publisher", p.publisher},
-	         {"courses", courses}, {"group_indecies", groups}};
+	         {"courses", courses}, {"group_indecies", groups},
+	         {"type", p.type()}};
     } else {
 	throw std::logic_error("Unknown pub type");
     }
@@ -198,6 +234,24 @@ void PubTable::load_json(std::string filename) {
 	    throw std::logic_error("Unknown pub type supplied");
 	}
     }
+}
+
+void PubTable::save_json(std::string filename) {
+	std::ofstream t(filename);
+	json table;
+	for (const auto & [_, value] : this->_table) {
+		json pub(*value);
+		table.push_back(pub);
+	}
+
+	t << table;
+}
+
+void StudyPubDescription::add_group(std::string group_name) {
+    if (this->group_indecies.size() == 8) {
+	throw std::logic_error("Max amount of courses reached");
+    }
+    this->group_indecies.push_back(group_name);
 }
 
 void PubTable::clean() { this->_table.clear(); }
